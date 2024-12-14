@@ -1,4 +1,4 @@
-#include "memory.h"
+﻿#include "memory.h"
 
 DWORD Memory::GetIdByName(const char* procName)
 {
@@ -64,7 +64,7 @@ bool Memory::Attach(const char* procName, bool waitForProcess)
 	if (strlen(procName) == 0)
 	{
 		attached = false;
-		return true;
+		return false; // more appropriate to return false if no process name is provided
 	}
 
 	if (waitForProcess)
@@ -73,20 +73,23 @@ bool Memory::Attach(const char* procName, bool waitForProcess)
 		{
 			id = GetIdByName(procName);
 
-			if (id == 0) continue;
+			if (id == 0)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(100)); // this is not ai made i promise bruh 😭
+				continue;
+			}
 
 			handle = OpenProcess(PROCESS_ALL_ACCESS, 0, id);
-			if (handle != nullptr) 
+			if (handle != nullptr)
 			{
 				attached = true;
 				return true;
 			}
+
 		}
 	}
-	else // old method i pasted it
+	else
 	{
-		if (strlen(procName) == 0) return true;
-
 		id = GetIdByName(procName);
 
 		if (id == 0)
@@ -99,7 +102,6 @@ bool Memory::Attach(const char* procName, bool waitForProcess)
 		attached = handle != nullptr;
 		return attached;
 	}
-
 }
 
 void Memory::Detach()
