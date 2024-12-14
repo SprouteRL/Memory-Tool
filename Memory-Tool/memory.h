@@ -26,11 +26,13 @@ public:
 	std::vector<LPVOID> allocatedMemory;
 	std::vector<HANDLE> heldMutex;
 
+	bool attached;
+
 public:
 	static DWORD GetIdByName(const char* procName);
 	uintptr_t GetBaseAddress(const char* moduleName);
 
-	bool Attach(const char* procName);
+	bool Attach(const char* procName, bool waitForProcess);
 	void Detach();
 
 	bool ChangeMemoryPage(const uintptr_t& address, const DWORD& newProtect, SIZE_T& size, DWORD& oldProtect);
@@ -83,7 +85,7 @@ public:
 	bool StandardInject(const std::string& path);
 
 public:
-	Memory(const char* procName = "");
+	Memory(const char* procName = "", bool waitForProcess=false);
 	~Memory();
 	bool TheCheck();
 };

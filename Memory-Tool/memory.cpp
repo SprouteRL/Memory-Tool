@@ -41,7 +41,7 @@ uintptr_t Memory::GetBaseAddress(const char* moduleName)
 #ifdef UNICODE
 			wchar_t wModuleName[MAX_PATH];
 			size_t convertedChars = 0;
-			mbstowcs_s(&convertedChars, wModuleName, MAX_PATH, moduleName, _TRUNCATE); 
+			mbstowcs_s(&convertedChars, wModuleName, MAX_PATH, moduleName, _TRUNCATE);
 			if (wcscmp(ModuleEntry32.szModule, wModuleName) == 0)
 #else
 			if (strcmp(ModuleEntry32.szModule, moduleName) == 0)
@@ -58,19 +58,48 @@ uintptr_t Memory::GetBaseAddress(const char* moduleName)
 	return dwModuleBaseAddress;
 }
 
-bool Memory::Attach(const char* procName)
+// if anyone wants organize this
+bool Memory::Attach(const char* procName, bool waitForProcess)
 {
-	if (strlen(procName) == 0) return true;
-
-	id = GetIdByName(procName);
-
-	if (id == 0)
+	if (strlen(procName) == 0)
 	{
-		return false;
+		attached = false;
+		return true;
 	}
 
-	handle = OpenProcess(PROCESS_ALL_ACCESS, 0, id);
-	return handle != nullptr;
+	if (waitForProcess)
+	{
+		while (true)
+		{
+			id = GetIdByName(procName);
+
+			if (id == 0) continue;
+
+			handle = OpenProcess(PROCESS_ALL_ACCESS, 0, id);
+			if (handle != nullptr) 
+			{
+				attached = true;
+				return true;
+			}
+		}
+	}
+	else // old method i pasted it
+	{
+		if (strlen(procName) == 0) return true;
+
+		id = GetIdByName(procName);
+
+		if (id == 0)
+		{
+			attached = false;
+			return false;
+		}
+
+		handle = OpenProcess(PROCESS_ALL_ACCESS, 0, id);
+		attached = handle != nullptr;
+		return attached;
+	}
+
 }
 
 void Memory::Detach()
@@ -95,6 +124,8 @@ void Memory::Detach()
 			CloseHandle(mutex);
 		}
 	}
+
+	attached = false;
 }
 
 bool Memory::ChangeMemoryPage(const uintptr_t& address, const DWORD& newProtect, SIZE_T& size, DWORD& oldProtect)
@@ -223,12 +254,14 @@ bool Memory::StandardInject(const std::string& path)
 	return true;
 }
 
-Memory::Memory(const char* procName)
+Memory::Memory(const char* procName, bool waitForProcess)
 {
+	attached = false;
+
 	if (strlen(procName) != 0)
 	{
 		ProcName = procName;
-		Attach(procName);
+		Attach(procName, waitForProcess);
 	}
 }
 
@@ -239,7 +272,7 @@ Memory::~Memory()
 
 bool Memory::TheCheck()
 {
-	return !this->ProcName.empty() && this->handle != nullptr;
+	return !this->ProcName.empty() && attached;
 }
 
 
