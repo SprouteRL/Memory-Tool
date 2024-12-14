@@ -35,6 +35,9 @@ public:
 	bool Attach(const char* procName, bool waitForProcess);
 	void Detach();
 
+	// i made it a function cuz im bored typing it every time i use this library
+	void WaitForAttach();
+
 	bool ChangeMemoryPage(const uintptr_t& address, const DWORD& newProtect, SIZE_T& size, DWORD& oldProtect);
 	bool IsMemoryOk(const uintptr_t& address);
 

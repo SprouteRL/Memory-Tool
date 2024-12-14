@@ -128,6 +128,14 @@ void Memory::Detach()
 	attached = false;
 }
 
+void Memory::WaitForAttach()
+{
+	do
+	{
+		continue;
+	} while (!attached);
+}
+
 bool Memory::ChangeMemoryPage(const uintptr_t& address, const DWORD& newProtect, SIZE_T& size, DWORD& oldProtect)
 {
 	if (!handle) return false;
