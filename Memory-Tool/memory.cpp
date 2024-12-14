@@ -132,7 +132,7 @@ void Memory::WaitForAttach()
 {
 	do
 	{
-		continue;
+		std::this_thread::sleep_for(std::chrono::seconds(0));
 	} while (!attached);
 }
 
