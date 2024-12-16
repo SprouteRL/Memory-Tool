@@ -30,7 +30,7 @@ DWORD Memory::GetIdByName(const char* procName)
 
 uintptr_t Memory::GetBaseAddress(const char* moduleName)
 {
-	DWORD dwModuleBaseAddress = 0;
+	uintptr_t dwModuleBaseAddress = 0;
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, id);
 	MODULEENTRY32 ModuleEntry32 = { 0 };
 	ModuleEntry32.dwSize = sizeof(MODULEENTRY32);
@@ -42,17 +42,19 @@ uintptr_t Memory::GetBaseAddress(const char* moduleName)
 			wchar_t wModuleName[MAX_PATH];
 			size_t convertedChars = 0;
 			mbstowcs_s(&convertedChars, wModuleName, MAX_PATH, moduleName, _TRUNCATE);
+
+			//std::wcout << ModuleEntry32.szExePath << ": 0x" << std::hex << ModuleEntry32.modBaseAddr << std::dec << "\n";
+
 			if (wcscmp(ModuleEntry32.szModule, wModuleName) == 0)
 #else
 			if (strcmp(ModuleEntry32.szModule, moduleName) == 0)
 #endif
 			{
-				dwModuleBaseAddress = (DWORD)ModuleEntry32.modBaseAddr;
+
+				dwModuleBaseAddress = (uintptr_t)ModuleEntry32.modBaseAddr;
 				break;
 			}
 		} while (Module32Next(hSnapshot, &ModuleEntry32));
-
-
 	}
 	CloseHandle(hSnapshot);
 	return dwModuleBaseAddress;
