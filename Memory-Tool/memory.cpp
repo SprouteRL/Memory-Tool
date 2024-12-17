@@ -69,6 +69,14 @@ bool Memory::Attach(const char* procName, bool waitForProcess)
 		return false; // more appropriate to return false if no process name is provided
 	}
 
+	id = GetIdByName(procName);
+
+	if (id == 0)
+	{
+		attached = false;
+		return false;
+	}
+
 	if (waitForProcess)
 	{
 		while (true)
@@ -150,15 +158,13 @@ bool Memory::ChangeMemoryPage(const uintptr_t& address, const DWORD& newProtect,
 	BOOL status = VirtualProtectEx(handle, &baseAddress, size, newProtect, &oldProtect);
 	return status == 0;
 }
-
-
 bool Memory::IsMemoryOk(const uintptr_t& address)
 {
 	MEMORY_BASIC_INFORMATION mem_info;
 	if (VirtualQueryEx(handle, reinterpret_cast<const void*>(address), &mem_info, sizeof(mem_info)) == sizeof(mem_info))
-	{
 		return mem_info.State == MEM_COMMIT && (mem_info.Type == MEM_PRIVATE || mem_info.Type == MEM_MAPPED);
-	}
+
+	return false;
 }
 
 LPVOID Memory::AllocateMemory(size_t size)
@@ -293,7 +299,7 @@ std::string functions::GetLastErrorStr()
 	DWORD lastErrorId = GetLastError();
 	if (lastErrorId == 0)
 	{
-		return "No error was found.";
+		return "No error was found.\n";
 	}
 
 	LPSTR messageBuffer = nullptr;

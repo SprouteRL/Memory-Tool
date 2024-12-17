@@ -6,6 +6,7 @@
 #include <thread>
 #include <fstream>
 #include <string>
+#include <Psapi.h>
 #include <memory>
 
 namespace functions
@@ -52,13 +53,15 @@ public:
 		Ty buffer = {};
 		if (!this->handle) return buffer;
 
-		if (checkOk && !IsMemoryOk(address)) return buffer;
-
-		LPVOID addy = reinterpret_cast<LPVOID>(address);
+		if (checkOk)
+		{
+			if (!IsMemoryOk(address)) return false;
+		}
 
 		if (!ReadProcessMemory(this->handle, addy, &buffer, sizeof(buffer), nullptr)) {
 			buffer = {};
 		}
+
 		return buffer;
 	}
 
@@ -87,8 +90,9 @@ public:
 
 	bool StandardInject(const std::string& path);
 
+
 public:
-	Memory(const char* procName = "", bool waitForProcess=false);
+	Memory(const char* procName = "", bool waitForProcess = false);
 	~Memory();
 	bool TheCheck();
 };
