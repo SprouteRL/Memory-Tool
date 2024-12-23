@@ -31,7 +31,7 @@ public:
 
 public:
 	static DWORD GetIdByName(const char* procName);
-	uintptr_t GetBaseAddress(const char* moduleName);
+	static uintptr_t GetBaseAddress(const char* moduleName);
 
 	bool Attach(const char* procName, bool waitForProcess);
 	void Detach();
