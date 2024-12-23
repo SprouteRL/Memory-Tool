@@ -31,7 +31,7 @@ public:
 
 public:
 	static DWORD GetIdByName(const char* procName);
-	static uintptr_t GetBaseAddress(const char* moduleName);
+	uintptr_t GetBaseAddress(const char* moduleName);
 
 	bool Attach(const char* procName, bool waitForProcess);
 	void Detach();
@@ -58,7 +58,7 @@ public:
 			if (!IsMemoryOk(address)) return false;
 		}
 
-		if (!ReadProcessMemory(this->handle, addy, &buffer, sizeof(buffer), nullptr)) {
+		if (!ReadProcessMemory(this->handle, (LPVOID)address, &buffer, sizeof(buffer), nullptr)) {
 			buffer = {};
 		}
 
@@ -89,7 +89,6 @@ public:
 	static bool KillProcess(const char* processName = "this");
 
 	bool StandardInject(const std::string& path);
-
 
 public:
 	Memory(const char* procName = "", bool waitForProcess = false);
