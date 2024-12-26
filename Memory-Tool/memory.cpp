@@ -17,7 +17,7 @@ DWORD Memory::GetIdByName(const char* procName)
 			mbstowcs_s(&convertedChars, wProcName, MAX_PATH, procName, _TRUNCATE); // Safe conversion
 			if (wcscmp(pe.szExeFile, wProcName) == 0)
 #else
-			if (strcmp(pe.szExeFile, wProcName) == 0)
+			if (strcmp(pe.szExeFile, procName) == 0)
 #endif
 			{
 				return pe.th32ProcessID;
