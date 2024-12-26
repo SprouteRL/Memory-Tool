@@ -63,6 +63,8 @@ uintptr_t Memory::GetBaseAddress(const char* moduleName)
 // if anyone wants organize this
 int Memory::Attach(const char* procName, bool waitForProcess)
 {
+	ProcName = procName;
+
 	if (strlen(procName) == 0)
 	{
 		attached = false;
