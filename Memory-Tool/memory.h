@@ -29,11 +29,20 @@ public:
 
 	bool attached;
 
+	enum ReturnFlags
+	{
+		OK = 1,
+		FAILED = 2,
+		FAILED_FIND_PROGRAM = 3,
+		UNEXPECTED = 4
+	};
+
+
 public:
 	static DWORD GetIdByName(const char* procName);
 	uintptr_t GetBaseAddress(const char* moduleName);
 
-	bool Attach(const char* procName, bool waitForProcess);
+	int Attach(const char* procName, bool waitForProcess);
 	void Detach();
 
 	// i made it a function cuz im bored typing it every time i use this library

@@ -61,12 +61,12 @@ uintptr_t Memory::GetBaseAddress(const char* moduleName)
 }
 
 // if anyone wants organize this
-bool Memory::Attach(const char* procName, bool waitForProcess)
+int Memory::Attach(const char* procName, bool waitForProcess)
 {
 	if (strlen(procName) == 0)
 	{
 		attached = false;
-		return false; // more appropriate to return false if no process name is provided
+		return ReturnFlags::FAILED;
 	}
 
 	id = GetIdByName(procName);
@@ -74,7 +74,7 @@ bool Memory::Attach(const char* procName, bool waitForProcess)
 	if (id == 0)
 	{
 		attached = false;
-		return false;
+		return ReturnFlags::FAILED_FIND_PROGRAM;
 	}
 
 	if (waitForProcess)
@@ -100,14 +100,6 @@ bool Memory::Attach(const char* procName, bool waitForProcess)
 	}
 	else
 	{
-		id = GetIdByName(procName);
-
-		if (id == 0)
-		{
-			attached = false;
-			return false;
-		}
-
 		handle = OpenProcess(PROCESS_ALL_ACCESS, 0, id);
 		attached = handle != nullptr;
 		return attached;
