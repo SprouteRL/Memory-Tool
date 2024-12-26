@@ -81,28 +81,43 @@ int Memory::Attach(const char* procName, bool waitForProcess)
 	{
 		while (true)
 		{
-			id = GetIdByName(procName);
-
 			if (id == 0)
 			{
 				std::this_thread::sleep_for(std::chrono::milliseconds(100)); // this is not ai made i promise bruh 😭
+				id = GetIdByName(procName);
 				continue;
 			}
 
 			handle = OpenProcess(PROCESS_ALL_ACCESS, 0, id);
-			if (handle != nullptr)
+			if(handle == nullptr)
+			{
+				attached = false;
+				return ReturnFlags::FAILED;
+			}
+			else
 			{
 				attached = true;
-				return true;
+				return ReturnFlags::OK;
 			}
-
+			
+			return ReturnFlags::FAILED;
 		}
 	}
 	else
 	{
 		handle = OpenProcess(PROCESS_ALL_ACCESS, 0, id);
-		attached = handle != nullptr;
-		return attached;
+		if(handle == nullptr)
+		{
+			attached = false;
+			return ReturnFlags::FAILED;
+		}
+		else
+		{
+			attached = true;
+			return ReturnFlags::OK;
+		}
+		
+		return ReturnFlags::FAILED;
 	}
 }
 

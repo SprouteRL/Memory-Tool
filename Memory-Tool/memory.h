@@ -22,11 +22,6 @@ public:
 	uintptr_t base;
 
 	std::string ProcName;
-
-public:
-	std::vector<LPVOID> allocatedMemory;
-	std::vector<HANDLE> heldMutex;
-
 	bool attached;
 
 	enum ReturnFlags
@@ -37,6 +32,9 @@ public:
 		UNEXPECTED = 4
 	};
 
+public:
+	std::vector<LPVOID> allocatedMemory;
+	std::vector<HANDLE> heldMutex;
 
 public:
 	static DWORD GetIdByName(const char* procName);
